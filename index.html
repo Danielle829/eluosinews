@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>俄罗斯新闻媒体交互</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      *::selection {
+        color: inherit;
+        background: transparent;
+      }
+
+      img {
+        -webkit-user-drag: none;
+        user-select: none;
+      }
+
+      *,
+      html,
+      body,
+      button,
+      img,
+      .choice-button,
+      .choice-button:hover,
+      .choice-button:active,
+      .choice-button:focus-visible,
+      .choice-button img {
+        cursor: url("src/button/shubiao-cursor.png") 0 0, auto !important;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        min-height: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: #000;
+        font-family: Arial, "Microsoft YaHei", sans-serif;
+      }
+
+      .scene {
+        position: relative;
+        width: 100%;
+        line-height: 0;
+      }
+
+      .scene__background {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .choice-button {
+        position: absolute;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        z-index: 2;
+        transform: translateX(-50%);
+        transform-origin: center;
+        transition: transform 180ms ease, filter 180ms ease;
+      }
+
+      .choice-button--page1 {
+        top: 88.62911796%;
+        left: 49.76076555%;
+        width: 31.10047847%;
+      }
+
+      .choice-button--page3 {
+        top: 67.48140276%;
+        left: 84.86842105%;
+        width: 21.6507177%;
+      }
+
+      .choice-button--page4 {
+        top: 83.52816153%;
+        left: 90.90909091%;
+        width: 14.95215311%;
+      }
+
+      .choice-button--page5 {
+        top: 15.62167906%;
+        left: 51.73444976%;
+        width: 42.34449761%;
+      }
+
+      .choice-button--page7 {
+        top: 83.52816153%;
+        left: 50.92703349%;
+        width: 50.65789474%;
+      }
+
+      .choice-button--page11 {
+        top: 82.78427205%;
+        left: 17.43421053%;
+        width: 28.16985646%;
+      }
+
+      .choice-button--page15 {
+        top: 65.88735388%;
+        left: 50.65789474%;
+        width: 30.38277512%;
+      }
+
+      .choice-button--page17 {
+        top: 75.87672689%;
+        left: 13.36722488%;
+        width: 21.47129187%;
+      }
+
+      .choice-button--page18 {
+        top: 32.41232731%;
+        left: 74.43181818%;
+        width: 5.08373206%;
+      }
+
+      .choice-button--page19 {
+        top: 63.33687566%;
+        left: 13.51674641%;
+        width: 22.48803828%;
+      }
+
+      .choice-button--page20 {
+        top: 65.9936238%;
+        left: 12.26076555%;
+        width: 19.25837321%;
+      }
+
+      .choice-button--page22 {
+        top: 76.40807651%;
+        left: 12.29066986%;
+        width: 19.55741627%;
+      }
+
+      .choice-button--page24 {
+        top: 75.66418704%;
+        left: 12.20095694%;
+        width: 19.37799043%;
+      }
+
+      .choice-button--choice1-result {
+        top: 84.27205101%;
+        left: 49.91028708%;
+        width: 23.50478469%;
+      }
+
+      .choice-button--choice2-result {
+        top: 85.65356004%;
+        left: 49.97009569%;
+        width: 24.82057416%;
+      }
+
+      .choice-button--choice3-result {
+        top: 85.44097768%;
+        left: 49.91028708%;
+        width: 24.82057416%;
+      }
+
+      .choice-button--ending1 {
+        top: 87.88522848%;
+        left: 50.02990431%;
+        width: 31.99760766%;
+      }
+
+      .choice-button--ending2 {
+        top: 90%;
+        left: 49.98046875%;
+        width: 32.8515625%;
+      }
+
+      .choice-button--ending3 {
+        top: 71.83846971%;
+        left: 49.94019139%;
+        width: 28.11004785%;
+      }
+
+      .choice-button:hover,
+      .choice-button:focus-visible {
+        filter: brightness(1.08);
+        transform: translateX(-50%) scale(1.06);
+      }
+
+      .choice-button:active {
+        filter: brightness(0.98);
+        transform: translateX(-50%) scale(1);
+      }
+
+      .choice-button:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 4px;
+      }
+
+      .choice-button img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .page-slices {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: none;
+      }
+
+      .page-slices.is-visible {
+        display: block;
+      }
+
+      .page-slice {
+        position: absolute;
+        display: block;
+        height: auto;
+        filter: brightness(1.02);
+        transform-origin: center;
+        transition: filter 180ms ease, transform 180ms ease;
+        z-index: 2;
+      }
+
+      .page-slice:hover,
+      .page-slice:focus-visible {
+        filter: brightness(1.12);
+        transform: scale(1.025);
+        z-index: 2;
+      }
+
+      .page-slice:active {
+        filter: brightness(1);
+        transform: scale(1);
+      }
+
+      .page-slice--12-1 {
+        top: 0;
+        left: 0;
+        width: 37.852%;
+      }
+
+      .page-slice--12-2 {
+        top: 0;
+        left: 32.744%;
+        width: 32.875%;
+      }
+
+      .page-slice--12-3 {
+        top: 50.194%;
+        left: 0;
+        width: 32.482%;
+      }
+
+      .page-slice--12-4 {
+        top: 50.097%;
+        left: 27.570%;
+        width: 33.726%;
+      }
+
+      .page-slice--12-5 {
+        top: 0;
+        left: 27.570%;
+        width: 72.430%;
+        z-index: 1;
+      }
+
+      .branch-options {
+        position: absolute;
+        inset: 0;
+        display: none;
+        z-index: 2;
+      }
+
+      .branch-options.is-visible {
+        display: block;
+      }
+
+      .branch-option {
+        position: absolute;
+        left: 29.12679426%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        transform-origin: center;
+        transition: filter 180ms ease, transform 180ms ease;
+      }
+
+      .branch-option:hover,
+      .branch-option:focus-visible {
+        filter: brightness(1.08);
+        transform: scale(1.06);
+      }
+
+      .branch-option:active {
+        transform: scale(1);
+      }
+
+      .branch-option--first {
+        top: 30.39319872%;
+        width: 41.80622010%;
+      }
+
+      .branch-option--second {
+        top: 44.31455898%;
+        width: 41.74641148%;
+      }
+
+      .branch-option--third {
+        top: 57.91710946%;
+        width: 41.80622010%;
+      }
+
+      .branch-option img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .fade-screen {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 850ms ease;
+        z-index: 10;
+      }
+
+      .fade-screen.is-active {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="scene">
+      <img class="scene__background" src="src/img/1.png" alt="俄罗斯新闻媒体交互">
+      <div class="page-slices" aria-hidden="true">
+        <img class="page-slice page-slice--12-1" src="src/img/12-1.png" alt="" tabindex="0">
+        <img class="page-slice page-slice--12-2" src="src/img/12-2.png" alt="" tabindex="0">
+        <img class="page-slice page-slice--12-3" src="src/img/12-3.png" alt="" tabindex="0">
+        <img class="page-slice page-slice--12-4" src="src/img/12-4.png" alt="" tabindex="0">
+        <img class="page-slice page-slice--12-5" src="src/img/12-5.png" alt="" tabindex="0">
+      </div>
+      <div class="branch-options" aria-hidden="true">
+        <button class="branch-option branch-option--first" type="button" data-target-page="25" aria-label="Keep Publishing Under Censorship"><img src="src/button/鎸夐挳閫夐」1.png" alt=""></button>
+        <button class="branch-option branch-option--second" type="button" data-target-page="27" aria-label="Publish the Truth and Risk Everything"><img src="src/button/鎸夐挳閫夐」2.png" alt=""></button>
+        <button class="branch-option branch-option--third" type="button" data-target-page="29" aria-label="Stop the Paper Before It Becomes a Lie"><img src="src/button/鎸夐挳閫夐」3.png" alt=""></button>
+      </div>
+      <button class="choice-button choice-button--page1" type="button" aria-label="Open the Newsroom Door">
+        <img src="src/button/鎸夐挳1.png" alt="">
+      </button>
+    </main>
+    <div class="fade-screen" aria-hidden="true"></div>
+    <audio class="background-audio" src="src/audio/长音效.MP3" preload="auto" autoplay loop playsinline></audio>
+    <audio class="background-audio" src="src/audio/长音效.MP3" preload="auto" autoplay loop playsinline></audio>
+    <audio class="background-audio" src="src/audio/长音效.MP3" preload="auto" autoplay loop playsinline></audio>
+    <audio id="page-turn-audio" src="src/audio/微弱翻书声.MP3" preload="auto"></audio>
+    <audio id="click-audio" src="src/audio/点击音效.MP3" preload="auto"></audio>
+    <script>
+      const sceneImage = document.querySelector(".scene__background");
+      const choiceButton = document.querySelector(".choice-button");
+      const choiceButtonImage = choiceButton.querySelector("img");
+      const pageSlices = document.querySelector(".page-slices");
+      const branchOptions = document.querySelector(".branch-options");
+      const branchOptionButtons = document.querySelectorAll(".branch-option");
+      const fadeScreen = document.querySelector(".fade-screen");
+      const backgroundAudios = document.querySelectorAll(".background-audio");
+      const pageTurnAudio = document.querySelector("#page-turn-audio");
+      const clickAudio = document.querySelector("#click-audio");
+      const pages = [
+        { image: "src/img/1.png" },
+        { image: "src/img/2.png" },
+        { image: "src/img/3.png" },
+        { image: "src/img/4.png" },
+        { image: "src/img/5.png" },
+        { image: "src/img/6.png" },
+        { image: "src/img/7.png" },
+        { image: "src/img/8.png" },
+        { image: "src/img/9.png" },
+        { image: "src/img/10.png" },
+        { image: "src/img/11.png" },
+        { image: "src/img/12.png" },
+        { image: "src/img/13.png" },
+        { image: "src/img/14.png" },
+        { image: "src/img/15.png" },
+        { image: "src/img/16.png" },
+        { image: "src/img/17.png" },
+        { image: "src/img/18.png" },
+        { image: "src/img/19.png" },
+        { image: "src/img/20.png" },
+        { image: "src/img/22.png" },
+        { image: "src/img/23.png" },
+        { image: "src/img/24.png" },
+        { image: "src/img/25.png" },
+        { image: "src/img/25-1.png" },
+        { image: "src/img/25-1-2.png" },
+        { image: "src/img/25-2.png" },
+        { image: "src/img/25-2-1.png" },
+        { image: "src/img/25-3.png" },
+        { image: "src/img/25-3-2.jpg" },
+        { image: "src/img/26.jpg" },
+        { image: "src/img/27.jpg" },
+        { image: "src/img/28.jpg" }
+      ];
+      const pageCount = pages.length;
+      let currentPage = 1;
+      const pageHistory = [];
+      let isTransitioning = false;
+      let hasStartedBackgroundAudio = false;
+
+      pages.forEach((page) => {
+        const image = new Image();
+        image.src = page.image;
+      });
+
+      backgroundAudios.forEach((audio) => {
+        audio.volume = 1;
+        audio.load();
+      });
+      pageTurnAudio.volume = 0.8;
+      clickAudio.volume = 0.8;
+      pageTurnAudio.load();
+      clickAudio.load();
+
+      const playAudio = (audio) => {
+        audio.pause();
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+
+        if (playPromise) {
+          playPromise.catch(() => {});
+        }
+      };
+
+      const startBackgroundAudio = () => {
+        if (hasStartedBackgroundAudio) {
+          return;
+        }
+
+        hasStartedBackgroundAudio = true;
+
+        backgroundAudios.forEach((audio) => {
+          const playPromise = audio.play();
+
+          if (playPromise) {
+            playPromise.catch(() => {
+              hasStartedBackgroundAudio = false;
+            });
+          }
+        });
+      };
+
+      const showPage = (pageNumber) => {
+        const page = pages[pageNumber - 1];
+        if (!page) {
+          return;
+        }
+
+        currentPage = pageNumber;
+        sceneImage.src = page.image;
+        pageSlices.classList.toggle("is-visible", pageNumber === 12);
+        pageSlices.setAttribute("aria-hidden", pageNumber === 12 ? "false" : "true");
+        branchOptions.classList.toggle("is-visible", pageNumber === 24);
+        branchOptions.setAttribute("aria-hidden", pageNumber === 24 ? "false" : "true");
+        window.scrollTo({ top: 0, behavior: "instant" });
+
+        if (pageNumber === 1) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page1";
+          choiceButtonImage.src = "src/button/鎸夐挳1.png";
+          choiceButton.setAttribute("aria-label", "Open the Newsroom Door");
+          return;
+        }
+
+        if (pageNumber === 3) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page3";
+          choiceButtonImage.src = "src/button/鎸夐挳3.png";
+          choiceButton.setAttribute("aria-label", "Review the Morning Headlines");
+          return;
+        }
+
+        if (pageNumber === 4) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page4";
+          choiceButtonImage.src = "src/button/鎸夐挳4.png";
+          choiceButton.setAttribute("aria-label", "6 hours later, dawn 06:00");
+          return;
+        }
+
+        if (pageNumber === 5) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page5";
+          choiceButtonImage.src = "src/button/鎸夐挳5.png";
+          choiceButton.setAttribute("aria-label", "Official censorship order");
+          return;
+        }
+
+        if (pageNumber === 7) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page7";
+          choiceButtonImage.src = "src/button/鎸夐挳7.png";
+          choiceButton.setAttribute("aria-label", "Redact violations, execute censorship");
+          return;
+        }
+
+        if (pageNumber === 11) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page11";
+          choiceButtonImage.src = "src/button/鎸夐挳11.png";
+          choiceButton.setAttribute("aria-label", "Follow today's edition");
+          return;
+        }
+
+        if (pageNumber === 15) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page15";
+          choiceButtonImage.src = "src/button/鎸夐挳15.png";
+          choiceButton.setAttribute("aria-label", "Return to the Newsroom");
+          return;
+        }
+
+        if (pageNumber === 17) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page17";
+          choiceButtonImage.src = "src/button/鎸夐挳17.png";
+          choiceButton.setAttribute("aria-label", "Start Editing");
+          return;
+        }
+
+        if (pageNumber === 18) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page18";
+          choiceButtonImage.src = "src/button/鎸夐挳18.png";
+          choiceButton.setAttribute("aria-label", "Replace All");
+          return;
+        }
+
+        if (pageNumber === 19) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page19";
+          choiceButtonImage.src = "src/button/鎸夐挳19.png";
+          choiceButton.setAttribute("aria-label", "Continue to the Silence");
+          return;
+        }
+
+        if (pageNumber === 20) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page20";
+          choiceButtonImage.src = "src/button/鎸夐挳20.png";
+          choiceButton.setAttribute("aria-label", "Check the Newsroom");
+          return;
+        }
+
+        if (pageNumber === 21) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page22";
+          choiceButtonImage.src = "src/button/鎸夐挳21.png";
+          choiceButton.setAttribute("aria-label", "Wait for the Law");
+          return;
+        }
+
+        if (pageNumber === 23) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--page24";
+          choiceButtonImage.src = "src/button/鎸夐挳24.png";
+          choiceButton.setAttribute("aria-label", "Face the Choice");
+          return;
+        }
+
+        if (pageNumber === 25) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--choice1-result";
+          choiceButtonImage.src = "src/button/choice1-1.png";
+          choiceButton.setAttribute("aria-label", "I Understand");
+          return;
+        }
+
+        if (pageNumber === 27) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--choice2-result";
+          choiceButtonImage.src = "src/button/choice2-1.png";
+          choiceButton.setAttribute("aria-label", "Publish the Original");
+          return;
+        }
+
+        if (pageNumber === 29) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--choice3-result";
+          choiceButtonImage.src = "src/button/choice3-1.png";
+          choiceButton.setAttribute("aria-label", "Stop the Presses");
+          return;
+        }
+
+        if (pageNumber === 31) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--ending1";
+          choiceButtonImage.src = "src/button/ending 1.png";
+          choiceButton.setAttribute("aria-label", "Why This Story");
+          return;
+        }
+
+        if (pageNumber === 32) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--ending2";
+          choiceButtonImage.src = "src/button/ending 2.png";
+          choiceButton.setAttribute("aria-label", "One Last Note");
+          return;
+        }
+
+        if (pageNumber === 33) {
+          choiceButton.hidden = false;
+          choiceButton.className = "choice-button choice-button--ending3";
+          choiceButtonImage.src = "src/button/ending 3.png";
+          choiceButton.setAttribute("aria-label", "Return to the Beginning");
+          return;
+        }
+
+        choiceButton.hidden = true;
+      };
+
+      sceneImage.addEventListener("error", () => {
+        console.error(`页面图片加载失败：${sceneImage.getAttribute("src")}`);
+      });
+
+      const transitionToPage = (pageNumber, recordHistory = true) => {
+        if (isTransitioning) {
+          return;
+        }
+
+        if (recordHistory && pageNumber !== currentPage) {
+          pageHistory.push(currentPage);
+        }
+
+        isTransitioning = true;
+        playAudio(pageTurnAudio);
+        fadeScreen.classList.add("is-active");
+
+        window.setTimeout(() => {
+          showPage(pageNumber);
+
+          window.setTimeout(() => {
+            fadeScreen.classList.remove("is-active");
+            isTransitioning = false;
+          }, 200);
+        }, 850);
+      };
+
+      const activateChoiceButton = () => {
+        startBackgroundAudio();
+        playAudio(clickAudio);
+
+        if (currentPage === 1) {
+          transitionToPage(2);
+          return;
+        }
+
+        if (currentPage === 3) {
+          transitionToPage(4);
+          return;
+        }
+
+        if (currentPage === 4) {
+          transitionToPage(5);
+          return;
+        }
+
+        if (currentPage === 5) {
+          transitionToPage(6);
+          return;
+        }
+
+        if (currentPage === 7) {
+          transitionToPage(8);
+          return;
+        }
+
+        if (currentPage === 11) {
+          transitionToPage(12);
+          return;
+        }
+
+        if (currentPage === 15) {
+          transitionToPage(16);
+          return;
+        }
+
+        if (currentPage === 17) {
+          transitionToPage(18);
+          return;
+        }
+
+        if (currentPage === 18) {
+          transitionToPage(19);
+          return;
+        }
+
+        if (currentPage === 19) {
+          transitionToPage(20);
+          return;
+        }
+
+        if (currentPage === 20) {
+          transitionToPage(21);
+          return;
+        }
+
+        if (currentPage === 21) {
+          transitionToPage(22);
+          return;
+        }
+
+        if (currentPage === 23) {
+          transitionToPage(24);
+          return;
+        }
+
+        if (currentPage === 25) {
+          transitionToPage(26);
+          return;
+        }
+
+        if (currentPage === 27) {
+          transitionToPage(28);
+          return;
+        }
+
+        if (currentPage === 29) {
+          transitionToPage(30);
+          return;
+        }
+
+        if (currentPage === 31) {
+          transitionToPage(32);
+          return;
+        }
+
+        if (currentPage === 32) {
+          transitionToPage(33);
+          return;
+        }
+
+        if (currentPage === 33) {
+          transitionToPage(1);
+        }
+      };
+
+      choiceButton.addEventListener("pointerdown", (event) => {
+        event.stopPropagation();
+        activateChoiceButton();
+      });
+
+      choiceButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+
+        if (event.detail === 0) {
+          activateChoiceButton();
+        }
+      });
+
+      branchOptionButtons.forEach((button) => {
+        button.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+          startBackgroundAudio();
+          playAudio(clickAudio);
+          transitionToPage(Number(button.dataset.targetPage));
+        });
+      });
+
+      document.addEventListener("pointerdown", (event) => {
+        startBackgroundAudio();
+
+        if (event.target.closest(".choice-button")) {
+          return;
+        }
+
+        if (currentPage === 2) {
+          transitionToPage(3);
+          return;
+        }
+
+        if (currentPage === 6) {
+          transitionToPage(7);
+          return;
+        }
+
+        if (currentPage === 8) {
+          transitionToPage(9);
+          return;
+        }
+
+        if (currentPage === 9) {
+          transitionToPage(10);
+          return;
+        }
+
+        if (currentPage === 10) {
+          transitionToPage(11);
+          return;
+        }
+
+        if (currentPage === 12) {
+          transitionToPage(13);
+          return;
+        }
+
+        if (currentPage === 13) {
+          transitionToPage(14);
+          return;
+        }
+
+        if (currentPage === 14) {
+          transitionToPage(15);
+          return;
+        }
+
+        if (currentPage === 16) {
+          transitionToPage(17);
+          return;
+        }
+
+        if (currentPage === 22) {
+          transitionToPage(23);
+          return;
+        }
+
+        if (currentPage === 26 || currentPage === 28 || currentPage === 30) {
+          transitionToPage(31);
+          return;
+        }
+
+      });
+
+      const showNextPage = () => {
+        if (currentPage < pageCount) {
+          transitionToPage(currentPage + 1);
+        }
+      };
+
+      const showPreviousPage = () => {
+        if (isTransitioning || pageHistory.length === 0) {
+          return;
+        }
+
+        const previousPage = pageHistory.pop();
+        transitionToPage(previousPage, false);
+      };
+
+      document.addEventListener("keydown", (event) => {
+        startBackgroundAudio();
+
+        if (event.key === "PageDown" || event.key === "ArrowDown") {
+          event.preventDefault();
+          showNextPage();
+          return;
+        }
+
+        if (event.key === "PageUp" || event.key === "ArrowUp") {
+          event.preventDefault();
+          showPreviousPage();
+          return;
+        }
+      });
+
+      document.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+      });
+
+      document.addEventListener("selectstart", (event) => {
+        event.preventDefault();
+      });
+
+      window.addEventListener("load", startBackgroundAudio);
+      startBackgroundAudio();
+
+    </script>
+  </body>
+</html>
